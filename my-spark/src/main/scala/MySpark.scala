@@ -1,0 +1,23 @@
+import org.apache.spark.{SparkConf, SparkContext}
+
+object MySpark {
+
+  def main(args: Array[String]) {
+    //本案例是新建一个int 型的List数组，对数组中的每个元素乘以3 ，再过滤出来数组中大于10 的元素，然后对数组求和。
+    val conf = new SparkConf().setAppName("test")
+    //setMaster("local") 本机的spark就用local，远端的就写ip
+    //如果是打成jar包运行则需要去掉 setMaster("local")因为在参数中会指定。
+    conf.setMaster("local")
+    val sc =new SparkContext(conf)
+    val rdd =sc.parallelize(List(1,2,3,4,5,6)).map(_*3)
+    val mappedRDD=rdd.filter(_>10).collect()
+    //对集合求和
+    println(rdd.reduce(_+_))
+    //输出大于10的元素
+    for(arg <- mappedRDD)
+      print(arg+" ")
+    println()
+    println("math is work")
+  }
+
+}
