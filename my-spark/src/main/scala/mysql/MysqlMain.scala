@@ -1,12 +1,12 @@
 package mysql
 
 import java.sql.{PreparedStatement, ResultSet}
-import java.util.Properties
+import java.util.{Date, Properties}
 
 import mysql.utils.MysqlConnection
 import org.apache.spark.SparkConf
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 object MysqlMain extends App with Logging{
 
@@ -33,9 +33,12 @@ object MysqlMain extends App with Logging{
 //  df.orderBy(- df("id")).show()
 //  df.agg("age" -> "max").show()
 //  df.agg("age" -> "avg").show()
-  df.groupBy("age").max().show()
-
+//  df.groupBy("age").max().show()
+  val ds: Dataset[User] = df.as[User]
+  ds.show()
 
   spark.stop()
+
+  case class User(id: Int, username: String, age: Int, password: String, created_at: String)
 
 }
