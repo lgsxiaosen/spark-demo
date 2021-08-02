@@ -23,11 +23,17 @@ object MysqlMain extends App with Logging{
   val jdbcUrl = "jdbc:mysql://localhost:3306/spark?useSSL=false&useUnicode=true&characterEncoding=UTF-8"
   prop.put("user", "root")
   prop.put("password", "root")
-  val frame: DataFrame = spark.read.jdbc(jdbcUrl, "user", prop)
-  frame.show()
-
-
-
+  val df: DataFrame = spark.read.jdbc(jdbcUrl, "user", prop)
+//  df.show()
+//  df.filter($"age">20).show()
+//  df.select("username").show()
+//  df.selectExpr("max(age)").show()
+//  df.select(df("id"), df("age")).show()
+//  df.orderBy(df("id")).show()
+//  df.orderBy(- df("id")).show()
+//  df.agg("age" -> "max").show()
+//  df.agg("age" -> "avg").show()
+  df.groupBy("age").max().show()
 
 
   spark.stop()
