@@ -1,4 +1,4 @@
-package mysql.utils
+package utils
 
 import java.sql.{Connection, DriverManager}
 import java.util.Objects

@@ -3,7 +3,7 @@ package mysql
 import java.sql.{PreparedStatement, ResultSet}
 import java.util.{Date, Properties}
 
-import mysql.utils.MysqlConnection
+import utils.MysqlConnection
 import org.apache.spark.SparkConf
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
