@@ -27,7 +27,14 @@ object LogWordCountHandler extends App with Logging{
         RequestInfo(logArray(2).toInt, logArray(3), logArray(1), Timestamp.valueOf(logArray(0)), city)
     })
     // 按城市统计，点击量
-    requestInfos.map(m => (m.city, 1)).reduceByKey(_+_).take(10).foreach(println)
+//    requestInfos.map(m => (m.city, 1)).reduceByKey(_+_).take(10).foreach(println)
+    // 按请求统计
+//    requestInfos.map(m => (m.url, 1)).reduceByKey(_+_).take(10).foreach(println)
+    // 城市和url统计
+    requestInfos.map(m => ((m.city, m.url), 1)).reduceByKey(_+_)
+      .sortBy(_._2, ascending = false)
+      .map(m => ("城市：" + m._1._1, "url：" + m._1._2, "点击量：" + m._2))
+      .take(10).foreach(println)
 
 
     spark.stop()
