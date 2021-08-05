@@ -31,10 +31,21 @@ object LogWordCountHandler extends App with Logging{
     // 按请求统计
 //    requestInfos.map(m => (m.url, 1)).reduceByKey(_+_).take(10).foreach(println)
     // 城市和url统计
-    requestInfos.map(m => ((m.city, m.url), 1)).reduceByKey(_+_)
-      .sortBy(_._2, ascending = false)
-      .map(m => ("城市：" + m._1._1, "url：" + m._1._2, "点击量：" + m._2))
-      .take(10).foreach(println)
+//    requestInfos.map(m => ((m.city, m.url), 1)).reduceByKey(_+_)
+//      .sortBy(_._2, ascending = false)
+//      .map(m => ("城市：" + m._1._1, "url：" + m._1._2, "点击量：" + m._2))
+//      .take(10).foreach(println)
+    // 先按城市点击量降序排序，城市内按url数量降序排序取城市前三
+    requestInfos.map(m => m.city -> List(m.url)).reduceByKey(_:::_)
+      .sortBy(_._2.size, ascending = false)
+      .mapValues(v => {
+          val vn =  v.map((_, 1)).groupBy(_._1).map(t => (t._1, t._2.size))
+          vn.toList.sortBy(-_._2).take(3)
+      }).flatMapValues(x => x)
+      .map{
+        case (city, (url, count)) => ("城市：" + city, "url：" + url, "点击量：" +count)}
+      .take(100)
+      .foreach(println)
 
 
     spark.stop()
