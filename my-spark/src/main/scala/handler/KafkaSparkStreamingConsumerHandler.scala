@@ -36,23 +36,28 @@ object KafkaSparkStreamingConsumerHandler {
             //如果是true，则这个消费者的偏移量会在后台自动提交
             "enable.auto.commit" -> (false: java.lang.Boolean)
         )
+
+        // ConsumerStrategies.Subscribe[String,String]可以节后多个参数，其中包含offset偏移量，一般将偏移量存储在第三方数据库中。
         //接收kafka里面的数据
         val directStream: InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream(streamingContext, LocationStrategies.PreferConsistent, ConsumerStrategies.Subscribe[String,String](Array(topic), kafkaParam))
 
         //使用foreachrdd循环遍历每一个rdd当中的数据
-        directStream.foreachRDD(x=>{
-            //x.count()>0就证明我们的rdd中有数据
-            if (x.count()>0){
-                //获取数据值
-                x.foreach(f=>{
-                    val value: String = f.value()
-                    println(value)
+        directStream.foreachRDD(ds=>{
+            if (ds.count()>0){
+                // rdd按分区处理数据
+                ds.foreachPartition(x => {
+                //x.count()>0就证明我们的rdd中有数据
+                    //获取数据值
+                    x.foreach(f=>{
+                        val value: String = f.value()
+                        println(value)
+                    })
                 })
-                //消费了kafka中的数据后提交offset信息,获取消费完之后的offset的值
-                //将rdd中的offset数据都取出来进行提交
-                val offsetRanges: Array[OffsetRange] = x.asInstanceOf[HasOffsetRanges].offsetRanges
-                //异步提交offset
-                directStream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
+            //消费了kafka中的数据后提交offset信息,获取消费完之后的offset的值
+            //将rdd中的offset数据都取出来进行提交
+            val offsetRanges: Array[OffsetRange] = ds.asInstanceOf[HasOffsetRanges].offsetRanges
+            //异步提交offset
+            directStream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
             }
         })
 
