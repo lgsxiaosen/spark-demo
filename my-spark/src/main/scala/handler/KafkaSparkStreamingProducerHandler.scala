@@ -37,7 +37,33 @@ object KafkaSparkStreamingProducerHandler {
             println(rmd.toString)
             Thread.sleep(500)
         }
-
+        /*producer = new KafkaProducer[Array[Byte], Array[Byte]](producerConfiguration)
+        while (iterator.hasNext && failedWrite == null) {
+          val currentRow = iterator.next()
+          // 这里的 projection 主要是构建 projectedRow，使得：
+          // 其第 0 号元素是 topic
+          // 其第 1 号元素是 key 的 binary 表示
+          // 其第 2 号元素是 value 的 binary 表示
+          val projectedRow = projection(currentRow)
+          val topic = projectedRow.getUTF8String(0)
+          val key = projectedRow.getBinary(1)
+          val value = projectedRow.getBinary(2)
+          if (topic == null) {
+            throw new NullPointerException(s"null topic present in the data. Use the " +
+            s"${KafkaSourceProvider.TOPIC_OPTION_KEY} option for setting a default topic.")
+          }
+          val record = new ProducerRecord[Array[Byte], Array[Byte]](topic.toString, key, value)
+          // 回调信息
+          val callback = new Callback() {
+            override def onCompletion(recordMetadata: RecordMetadata, e: Exception): Unit = {
+              if (failedWrite == null && e != null) {
+                failedWrite = e
+              }
+              println(recordMetadata)
+            }
+          }
+          producer.send(record, callback)
+    }*/
         producer.close()
     }
 
